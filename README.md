@@ -1,6 +1,6 @@
 # Taming Transformers for High-Resolution Image Synthesis (VQGAN-win64)
 
-This is a modified version of [**Taming Transformers for High-Resolution Image Synthesis**](https://github.com/CompVis/taming-transformers?tab=readme-ov-file#training-on-custom-data) for windows systems. It can be used to train a VQGAN on custom data and monitor training using tensorboard.
+This is a modified version of [**Taming Transformers for High-Resolution Image Synthesis**](https://github.com/CompVis/taming-transformers?tab=readme-ov-file#training-on-custom-data) for windows systems.The code uses 'dp' instead of 'ddp' for gpu backend, and was tested with CUDA 11.8, NVIDIA GeForce RTX 4070. The code can be used to train a VQGAN on custom data and monitor training using tensorboard.
 
 ##### CVPR 2021 (Oral)
 ![teaser](assets/mountain.jpeg)
