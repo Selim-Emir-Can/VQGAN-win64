@@ -476,6 +476,43 @@ if __name__ == "__main__":
                 "save_last": True,
             }
         }
+
+        # ModelCheckpoint configuration for best and last checkpoints
+        best_model_ckpt_cfg = {
+            "target": "pytorch_lightning.callbacks.ModelCheckpoint",
+            "params": {
+                "dirpath": ckptdir,
+                "filename": "{epoch:06d}-val_rec_loss-{val_loss:.4f}",  # Save best checkpoint with epoch and metric
+                "monitor": "val/rec_loss",  # Replace with your monitored metric (e.g., val_accuracy)
+                "mode": "min",  # Use "min" for loss, "max" for metrics like accuracy
+                "save_top_k": -1,  # Retain only the best model
+                "verbose": True,
+            },
+        }
+
+        # from pytorch_lightning.callbacks import ModelCheckpoint
+
+        # class EveryNEpochCheckpoint(ModelCheckpoint):
+        #     def __init__(self, every_n_epochs, *args, **kwargs):
+        #         super().__init__(*args, **kwargs)
+        #         self.every_n_epochs = every_n_epochs
+
+        #     def on_epoch_end(self, trainer, pl_module):
+        #         # Only save checkpoint every N epochs
+        #         if (trainer.current_epoch + 1) % self.every_n_epochs == 0:
+        #             # Generate a unique filename for this checkpoint
+        #             filename = f"last-{trainer.current_epoch + 1:06d}.ckpt"
+        #             filepath = self.format_checkpoint_name(
+        #                 filename, trainer.current_epoch + 1, {}, trainer
+        #             )
+        #             self._save_checkpoint(trainer, pl_module, filepath)
+
+        # last_checkpoint_callback = EveryNEpochCheckpoint(every_n_epochs=10,
+        #                                                  dirpath=ckptdir,
+        #                                                  filename="last-{epoch:06d}",
+        #                                                  verbose=True,
+        #                                                 )
+
         if hasattr(model, "monitor"):
             print(f"Monitoring {model.monitor} as checkpoint metric.")
             default_modelckpt_cfg["params"]["monitor"] = model.monitor
@@ -514,11 +551,13 @@ if __name__ == "__main__":
                     #"log_momentum": True
                 }
             },
+            "best_checkpoint": best_model_ckpt_cfg,  # Add best checkpoint configuration
         }
         callbacks_cfg = lightning_config.callbacks or OmegaConf.create()
         callbacks_cfg = OmegaConf.merge(default_callbacks_cfg, callbacks_cfg)
         trainer_kwargs["callbacks"] = [instantiate_from_config(callbacks_cfg[k]) for k in callbacks_cfg]
 
+        # trainer_kwargs["callbacks"].append(last_checkpoint_callback)
         trainer = Trainer.from_argparse_args(trainer_opt, **trainer_kwargs)
 
         # data
